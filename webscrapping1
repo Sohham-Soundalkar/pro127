@@ -1,0 +1,38 @@
+from selenium import webdriver
+from bs4 import BeautifulSoup
+import time
+import csv
+
+url = 'https://en.wikipedia.org/wiki/List_of_brightest_stars_and_other_record_stars'
+browser = webdriver.Chrome('C:/Users/Sohham/Downloads/chromedriver.exe')
+browser.get(url)
+time.sleep(10)
+
+def scrap():
+    headers = ['Name', 'Distance', 'Mass', 'Radius']
+    brightest_stars_data = []
+    for i in range(0,97):
+        soup = BeautifulSoup(browser.page_source, 'html.parser')
+        for ul_tag in soup.find_all('ul', attrs={'class', 'brightest_stars'}):
+            li_tag = ul_tag.find_all('li')
+
+            temp_list = []
+            for index, li_tag in enumerate(li_tag):
+                if index == 0:
+                    temp_list.append(li_tag.find_all('a')[0].contents[0])
+
+                else:
+                    try:
+                        temp_list.append(li_tag.contents[0])
+
+                    except:
+                        temp_list.append('')
+
+            brightest_stars_data.append(temp_list)
+    
+    with open('brightest_stars_data.csv', 'w') as a:
+        csv_writter = csv.writer(a)
+        csv_writter.writerow(headers)
+        csv_writter.writerows(brightest_stars_data)
+
+scrap()
